@@ -21,11 +21,30 @@
                 console.log(todo);
                 const todos = document.querySelector('#todos');
                 const newTodo = document.createElement('div');
-                newTodo.innerText = todo.title;
+                newTodo.id = 'todo_' + todo.id;
+                newTodo.className = 'item';
+
+                function createEl(tag, text) {
+                    const el = document.createElement(tag)
+                    el.className = 'col';
+                    el.innerText = text;
+                    return el;
+                }
+                ['id', 'title', 'createdAt'].map(key => newTodo.appendChild(
+                    key === 'dlt' ? createEl('button', 'DELETE') : createEl('div', todo[key])
+                ));
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'col';
+                deleteButton.innerText = 'DELETE';
+                deleteButton.onclick = () => deleteTodo(todo.id);
+                newTodo.appendChild(deleteButton);
+
+
                 if (todos.childElementCount === 0) {
                     todos.appendChild(newTodo);
                 } else {
-                    todos.insertBefore(newTodo, todos.children[0]);
+                    todos.insertBefore(newTodo, todos.children[1]);
                 }
             }
 
@@ -41,21 +60,38 @@
                 } = data;
                 document.querySelector('#todo_' + id).remove();
             }
+
+            window.addEventListener('load', () => {
+                const todos = <%- todos %>;
+                todos.map(todo => appendTodo(todo));
+            });
         </script>
+        <style>
+            .item {
+                display: flex;
+                justify-content: space-between;
+                width: 50%;
+                margin: 5px;
+            }
+            
+            .col {
+                display: block;
+                width: 25%;
+                text-align: center;
+            }
+        </style>
     </head>
 
     <body>
         <input id="new_todo_title" type="text">
         <button onclick="createTodo()">CREATE</button>
         <div id="todos">
-            <% for(const todo of todos) { %>
-                <div id="todo_<%= todo.id %>">
-                    <span> <%= todo.id %> </span>
-                    <span> <%= todo.title %></span>
-                    <span> <%= todo.createdAt %></span>
-                    <span> <button onClick="deleteTodo(<%= todo.id %>)">DELETE</button></span>
-                </div>
-                <% } %>
+            <div class="item">
+                <div class="col">ID</div>
+                <div class="col">タイトル</div>
+                <div class="col">作成日次</div>
+                <div class="col">削除</div>
+            </div>
         </div>
     </body>
 

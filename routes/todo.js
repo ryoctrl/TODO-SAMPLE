@@ -3,8 +3,8 @@ const router = express.Router();
 const todo = require('../models').todo;
 
 router.get('/', async(req, res) => {
-    const todos = await todo.findAll();
-    res.status(200).render('todo', { todos });
+    const todos = await todo.findAll().then(todos => todos.map(todo => todo.dataValues));
+    res.status(200).render('todo', { todos: JSON.stringify(todos) });
 });
 
 router.post('/create', async(req, res) => {
