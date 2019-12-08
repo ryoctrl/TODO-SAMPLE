@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>todo</title>
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+        <script>
+            function createTodo() {
+                const titleInput = document.querySelector('#new_todo_title');
+                const title = titleInput.value;
+                titleInput.value = '';
+                if (!title) return;
+                axios.post('/todo/create', {
+                    title
+                }).then(res => res.data).then(data => appendTodo(data));
+
+            }
+
+            function appendTodo(todo) {
+                console.log(todo);
+                const todos = document.querySelector('#todos');
+                const newTodo = document.createElement('div');
+                newTodo.innerText = todo.title;
+                if (todos.childElementCount === 0) {
+                    todos.appendChild(newTodo);
+                } else {
+                    todos.insertBefore(newTodo, todos.children[0]);
+                }
+            }
+
+            function deleteTodo(id) {
+                axios.post('/todo/delete', {
+                    id
+                }).then(res => res.data).then(data => removeTodo(data));
+            }
+
+            function removeTodo(data) {
+                const {
+                    id
+                } = data;
+                document.querySelector('#todo_' + id).remove();
+            }
+        </script>
+    </head>
+
+    <body>
+        <input id="new_todo_title" type="text">
+        <button onclick="createTodo()">CREATE</button>
+        <div id="todos">
+            <% for(const todo of todos) { %>
+                <div id="todo_<%= todo.id %>">
+                    <span> <%= todo.id %> </span>
+                    <span> <%= todo.title %></span>
+                    <span> <%= todo.createdAt %></span>
+                    <span> <button onClick="deleteTodo(<%= todo.id %>)">DELETE</button></span>
+                </div>
+                <% } %>
+        </div>
+    </body>
+
+</html>
